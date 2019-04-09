@@ -24,7 +24,7 @@ namespace OracleWithDapper.Repositories
             _dbConnection = dbConnection;
         }
 
-        public int AddGame(int in_id, string in_name, string in_genre, string in_esrb_rating)
+        public int AddGame(string in_name, string in_genre, string in_esrb_rating)
         {
             DynamicParameters dynamicParameters = new DynamicParameters(new {
                 Name = in_name,
@@ -32,7 +32,7 @@ namespace OracleWithDapper.Repositories
                 ESRB_Rating = in_esrb_rating
             });
 
-            string sql = "INSERT INTO GAMECATALOG(Name, Genre, ESRB_RATING) Values(:Name, :Genre, :ESRB_Rating)";
+            string sql = "INSERT INTO GAMECATALOG(Name, Genre, ESRB_RATING) Values(@Name, @Genre, @ESRB_Rating)";
 
             int rowsAffected = this._dbConnection.Execute(sql, dynamicParameters);
 
@@ -41,7 +41,11 @@ namespace OracleWithDapper.Repositories
 
         public List<GameCatalog> GetGameCatalog()
         {
-            return this._dbConnection.Query<GameCatalog>("Select * from GameCatalog").ToList();
+            List<GameCatalog> games;
+
+            games = this._dbConnection.Query<GameCatalog>(sql: "GetAllGames", commandType: CommandType.StoredProcedure).ToList();
+
+            return games;
         }
 
         public int RemoveGame(int id)
